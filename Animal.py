@@ -1,13 +1,11 @@
 from abc import ABC,abstractmethod
 
-
 class HumanInteractionsMixin:
     def interacting_with_humans(self, interaction_type: str):
         if interaction_type in ["zookeper", "owner"]:
             return f"{self.name} goes to interact with the {interaction_type}"
         else:
             return f"{self.name} is wary of the {interaction_type}"
-
 
 class Animal(ABC, HumanInteractionsMixin):
     def __init__(self,name,age,place,hunger,energy):
@@ -16,6 +14,7 @@ class Animal(ABC, HumanInteractionsMixin):
         self.__place=place
         self._hunger = hunger
         self._energy = energy
+        self.is_alive=True
 
     @property   #getterebi rom mivwvdet classis private monacemebs
     def name(self):
@@ -36,7 +35,11 @@ class Animal(ABC, HumanInteractionsMixin):
 
     @hunger.setter      # setteri  food values mixedvit shecvlis shimshilis  dones
     def hunger(self, food):
-        self._hunger = food
+        if food >= 0:
+            self._hunger = food
+        else:
+            print("Can not set hunger variable")
+
 
     @property
     def energy(self):
@@ -44,7 +47,11 @@ class Animal(ABC, HumanInteractionsMixin):
 
     @energy.setter
     def energy(self, value):
-        self._energy = value
+        if value >=0:
+            self._energy = value
+        else:
+            print("Can not set energy variable")
+
 
     @abstractmethod
     def movement(self,speed:float):
@@ -59,12 +66,13 @@ class Animal(ABC, HumanInteractionsMixin):
         pass
 
     def __str__(self):
-        return f"This animal is {self.name},\n{self.name}'s age is {self.age},\n{self.name} lives in {self.place}"
-    
+        return f"This Animal is {self.__class__.__name__}, \nIt's name is {self.name},\n{self.name} is {self.age} years old,\n{self.name} lives in {self.place}"
+
     def __repr__(self):
-        return f"Animal(name='{self.name}', age={self.age}, place='{self.place}')"
-
-
+        if self.is_alive:
+            return f"{self.__class__.__name__}('{self.name}', {self.age}, '{self.place}', {self.hunger}, {self.energy})"
+        else:
+            return f"{self.__class__.__name__} {self.name} is dead"
 
 
 class Mammal(Animal,ABC):
@@ -120,8 +128,7 @@ class Lion(Mammal):
 
     def breast_feed(self,cub):
         if cub.age<0.5:
-            cub.hunger-=10
-            return f"{cub.name} has been breast fed,hunger level decreased [{cub.hunger}]"
+            return f"{cub.name} has been breast fed"
         else:
             return "To big for breast Milk"
 
@@ -130,6 +137,7 @@ class MixinKill:
         if isinstance(prey,Animal):    #aucilebelia shevamowmot rom argumenti namdvilad iyos animali.
             print("Prey died")
             prey.energy=0
+            prey.is_alive=False
         else:
             return "this is not prey"
 
@@ -145,19 +153,14 @@ class Predator(MixinKill):              #predator clasi functionirebs kompozicii
 
             if prey.energy<self.animal.energy:
                 self.animal.hunger -=10
-                print( f'{self.animal.name} hunted {prey.name}.Hunger level of {self.animal.name}decreased.Current->{self.animal.hunger}')
+                print( f'{self.animal.name} hunted {prey.name}.Hunger level of {self.animal.name} decreased.  Current->{self.animal.hunger}')
                 self.kill(prey)
             else:
                 print( f'Hunt failed, {prey.name} is alive')
 
+
 """ vinaidan predator aeqstendebs mixinkill class shegvidzlia gamoviyenot misi funcia killic current objectistvis(self)
     romelic parametrad miighebs preys da washlis mas mexsierebidan"""
-
-
-
-
-class Reptiles(Animal):
-    pass
 
 
 class Birds(Animal, ABC):
@@ -232,21 +235,44 @@ class Eagle(Birds):
         return eaglet 
 
 
+""" Test Of Lion Object """
+lion1=Lion('lion',5,'savannah',50,100)
+print(lion1.make_sound())
+lion1.movement(40)
+print(lion1)   #edzaxis __str__ s
+print("\n\n")
 
-# lion1=Lion('lion',5,'savannah',50,100)
-# print(lion1)   #edzaxis __str__ s
+lion_cub1=lion1.reproduce()
 
-# lion_cub1=lion1.reproduce()
-# print(lion_cub1)
-# print(lion1.breast_feed(lion_cub1))
+print(lion_cub1)
+print(lion1.breast_feed(lion_cub1))
 
-# lion_predator=Predator(lion1)
+print("\n\n")
 
-# zebra1=Zebra('zebra',3,'savannah',10,30)
-# lion_predator.hunt(zebra1)
+print(repr(lion1))  #dabechdavs lion1 s
+
+print("\n\n")
+
+"""sheiqmna predator klasis obieqti lion_predator romelic gamoiyenebs hunt funqcionals"""
+lion_predator=Predator(lion1)
+
+""" Create zebra object"""
+zebra1=Zebra('zebra',3,'savannah',10,30)
+print(zebra1.make_sound())
+zebra1.movement(10)
+print(repr(zebra1))
+
+print("\n\n")
+print("Lion starts hunting")
+lion_predator.hunt(zebra1)
+print("Zebra is Done")
+print("\n\n")
+
+print(repr(lion1))
+print(repr(zebra1))      #abrunebs zebra is dead repr funqciashi validaciis pirobis gamo
 
 
-
+#Tests for Birds
 penguin1 = Penguin("Rico", 5, "Madagascar", 10, 100, 0)
 print(penguin1)
 print(repr(penguin1))
@@ -275,9 +301,7 @@ print(eagle1.lay_eggs())
 print(eagle1.reproduce("Ethan Junior"))
 print(eagle1.interacting_with_humans("owner"))
 
+print("----------------------------------------------------")
+
 Predator(eagle1).hunt(penguin1)
-
-
-
-
 
