@@ -163,6 +163,82 @@ class Predator(MixinKill):              #predator clasi functionirebs kompozicii
     romelic parametrad miighebs preys da washlis mas mexsierebidan"""
 
 
+
+""" Reptiles Section """
+
+class Reptiles(Animal, ABC):
+    def __init__(self, name, age, place, hunger, energy, shedding_stage):
+        super().__init__(name, age, place, hunger, energy)
+        self._shedding_stage = shedding_stage
+
+    @property
+    def shedding_stage(self):
+        return self._shedding_stage
+
+    @shedding_stage.setter
+    def shedding_stage(self, value):
+        if value in ["not shedding", "starting to shed", "shedding", "fully shed"]:
+            self._shedding_stage = value
+        else:
+            print("Invalid shedding stage")
+
+    @abstractmethod
+    def shed_skin(self):
+        pass
+
+class Snake(Reptiles):
+    def movement(self, speed):
+        if speed == 0:
+            self.energy -= 0
+        elif 1 <= speed <= 5:
+            self.energy -= 10
+        elif 5 < speed <= 15:
+            self.energy -= 20
+        else:
+            return "Not Possible"
+
+    def make_sound(self):
+        return "Hissss"
+
+    def shed_skin(self):
+        if self.energy < 20:
+            return f"{self.name} is too tired to shed skin!"
+        self.energy -= 15
+        self.shedding_stage = "fully shed"
+        return f"{self.name} shed its skin successfully!"
+
+    def reproduce(self, baby_snake):
+        return Snake(baby_snake, 0, self.place, 0, 0, "not shedding")
+
+
+class Lizard(Reptiles):
+    def movement(self, speed):
+        if speed == 0:
+            self.energy -= 0
+        elif 1 <= speed <= 10:
+            self.energy -= 15
+        elif 10 < speed <= 25:
+            self.energy -= 30
+        else:
+            return "Not Possible"
+
+    def make_sound(self):
+        return "growl"
+
+    def shed_skin(self):
+        if self.energy < 30:
+            return f"{self.name} is too tired to shed skin!"
+        self.energy -= 20
+        self.shedding_stage = "fully shed"
+        return f"{self.name} shed its skin successfully!"
+
+    def reproduce(self, baby_lizard):
+        return Lizard(baby_lizard, 0, self.place, 0, 0, "not shedding")
+
+
+
+""" Birds Section """
+
 class Birds(Animal, ABC):
 
     def __init__(self, name, age, place, hunger, energy, eggs):
@@ -272,7 +348,23 @@ print(repr(lion1))
 print(repr(zebra1))      #abrunebs zebra is dead repr funqciashi validaciis pirobis gamo
 
 
-#Tests for Birds
+""" Test of Reptiles """
+
+snake1 = Snake("Kaa", 3, "Monkey City", 10, 100, "not shedding")
+lizard1 = Lizard("Komodo", 5, "Island of Komodo", 15, 120, "starting to shed")
+
+print(snake1)
+print(snake1.shed_skin())
+print(snake1.reproduce("Baby Kaa"))
+print("\n")
+print(lizard1)
+print(lizard1.shed_skin())
+print(lizard1.reproduce("Baby Dragon"))
+print("\n")
+
+
+"""Tests for Birds"""
+
 penguin1 = Penguin("Rico", 5, "Madagascar", 10, 100, 0)
 print(penguin1)
 print(repr(penguin1))
@@ -304,4 +396,3 @@ print(eagle1.interacting_with_humans("owner"))
 print("----------------------------------------------------")
 
 Predator(eagle1).hunt(penguin1)
-
